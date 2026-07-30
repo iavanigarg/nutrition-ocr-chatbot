@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition OCR RAG Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sticky Top Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Nutrition OCR RAG Assistant</h1>
+                <p class="subtitle">Ask questions about your uploaded documents</p>
+            </div>
+        </header>
+        
+        <!-- Scrollable Conversation Area -->
+        <main id="chat-history" class="chat-history">
+            <!-- Initial Greeting -->
+            <div class="message assistant">
+                <div class="message-content">Hello! I'm your Nutrition OCR RAG Assistant. Ask me anything about your documents.</div>
+            </div>
+        </main>
+
+        <!-- Sticky Bottom Input Area -->
+        <footer class="app-footer">
+            <div class="input-container">
+                <input type="file" id="file-upload" accept=".pdf" style="display: none;">
+                <button id="upload-button" title="Upload Document" style="margin-right: 8px; background: var(--text-muted);">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </button>
+                <textarea id="question-input" rows="1" placeholder="Ask anything about your document..."></textarea>
+                <button id="send-button" title="Send (Enter) / New Line (Shift+Enter)">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="footer-note">Press Enter to send, Shift+Enter for a new line.</div>
+        </footer>
+    </div>
+
+    <!-- Thinking Template (Hidden, used by JS) -->
+    <template id="thinking-template">
+        <div class="thinking-animation">
+            Thinking<span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+    </template>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>
