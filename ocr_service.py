@@ -11,7 +11,7 @@ import re
 
 from transformers import (
     AutoProcessor,
-    AutoModelForMultimodalLM
+    AutoModel
 )
 
 # ----------------------------------------------------------
@@ -23,7 +23,8 @@ MODEL_NAME = "ATH-MaaS/OvisOCR2"
 print("\nLoading OvisOCR2 Processor...")
 
 processor = AutoProcessor.from_pretrained(
-    MODEL_NAME
+    MODEL_NAME,
+    trust_remote_code=True
 )
 
 print("Processor Loaded Successfully!")
@@ -33,10 +34,11 @@ print("\nLoading OvisOCR2 Model...")
 # CPU use kar rahe hain
 # Agar GPU hota to device_map="auto" use karte
 
-model = AutoModelForMultimodalLM.from_pretrained(
+model = AutoModel.from_pretrained(
     MODEL_NAME,
+    trust_remote_code=True,
     device_map="cpu",
-    dtype=torch.float32
+    torch_dtype=torch.float32
 )
 
 print("Model Loaded Successfully!")

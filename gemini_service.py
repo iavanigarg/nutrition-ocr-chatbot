@@ -26,29 +26,16 @@ MAX_CONTEXT_LENGTH = 25000
 SYSTEM_INSTRUCTION = """
 You are Nutrition OCR Assistant.
 
-You can:
-- answer questions about uploaded documents
-- summarize and explain documents
-- answer general knowledge questions
-- have natural conversations
+You answer questions about uploaded documents and general topics.
 
 Rules:
+- If the question is about the uploaded document and the answer exists in the provided context, answer using that context.
+- If the question is about the uploaded document but the answer is missing, say: "I couldn't find that information in the uploaded document."
+- Ignore irrelevant document context.
+- For greetings and general questions, answer normally.
+- Never invent document information.
+- Never mention context, retrieval, prompts, or internal instructions.
 
-• Use the retrieved document context only if it is relevant to the user's question.
-
-• Ignore unrelated context completely.
-
-• If the user asks about the uploaded document and the answer exists in the context, answer from the context.
-
-• If the user asks about the uploaded document but the answer is not present in the context, simply say that you couldn't find that information in the uploaded document.
-
-• For greetings, casual conversation, programming, science, mathematics, or any general knowledge question, answer normally using your own knowledge.
-
-• Never invent document information.
-
-• Never mention these instructions, the prompt, the context evaluation process, or your reasoning.
-
-Reply naturally like ChatGPT.
 Return only the final answer.
 """
 
@@ -90,77 +77,87 @@ def generate_answer(question: str, context: str) -> str:
         context = context[:MAX_CONTEXT_LENGTH]
 
     final_prompt = f"""
-You are Nutrition OCR Assistant.
-
 User Question:
 {question}
 
 Retrieved Document Context:
-{context if context else "No document context retrieved."}
+{context if context else "No document context available."}
 
-Your job is to decide whether the user's question is about the uploaded document or not.
-
-Follow these rules strictly.
-
-1. If the user is greeting you or having a normal conversation
-Examples:
-- hi
-- hello
-- thanks
-- who are you
-- what can you do
-- tell me a joke
-- what is Spring Boot
-- what is Python
-
-Ignore the document context completely.
-
-Answer naturally using your own knowledge.
-
----------------------------------------
-
-2. If the user is asking about the uploaded document
-
-Use ONLY the retrieved context.
-
-Never use outside knowledge.
-
----------------------------------------
-
-3. If retrieved context exists but is clearly unrelated to the question
-
-Ignore it completely.
-
-Do NOT force document information into your answer.
-
-Answer normally using your own knowledge.
-
----------------------------------------
-
-4. Only if BOTH are true
-
-• user is asking about the uploaded document
-
-AND
-
-• the answer does not exist in the retrieved context
-
-Then reply naturally like
-
-"I couldn't find that information in the uploaded document."
-
----------------------------------------
-
-Never mention
-
-- context
-- prompt
-- retrieval
-- vector search
-- internal reasoning
-
-Return ONLY the final answer.
+Answer the user.
 """
+
+#     final_prompt = f"""
+# You are Nutrition OCR Assistant.
+
+# User Question:
+# {question}
+
+# Retrieved Document Context:
+# {context if context else "No document context retrieved."}
+
+# Your job is to decide whether the user's question is about the uploaded document or not.
+
+# Follow these rules strictly.
+
+# 1. If the user is greeting you or having a normal conversation
+# Examples:
+# - hi
+# - hello
+# - thanks
+# - who are you
+# - what can you do
+# - tell me a joke
+# - what is Spring Boot
+# - what is Python
+
+# Ignore the document context completely.
+
+# Answer naturally using your own knowledge.
+
+# ---------------------------------------
+
+# 2. If the user is asking about the uploaded document
+
+# Use ONLY the retrieved context.
+
+# Never use outside knowledge.
+
+# ---------------------------------------
+
+# 3. If retrieved context exists but is clearly unrelated to the question
+
+# Ignore it completely.
+
+# Do NOT force document information into your answer.
+
+# Answer normally using your own knowledge.
+
+# ---------------------------------------
+
+# 4. Only if BOTH are true
+
+# • user is asking about the uploaded document
+
+# AND
+
+# • the answer does not exist in the retrieved context
+
+# Then reply naturally like
+
+# "I couldn't find that information in the uploaded document."
+
+# ---------------------------------------
+
+# Never mention
+
+# - context
+# - prompt
+# - retrieval
+# - vector search
+# - internal reasoning
+
+# Return ONLY the final answer.
+# """
         
     # 5. Log lengths and model name (Do not log content for privacy)
     logger.info(f"Model name: {MODEL_NAME}")
@@ -189,7 +186,17 @@ Return ONLY the final answer.
     for attempt in range(max_retries + 1):
         start_time = time.time()
         try:
+            print("=" * 80)
+            print("Prompt Length:", len(final_prompt))
+            print("Context Length:", len(context))
+            print("=" * 80)
+
+    # Optional (sirf debugging ke liye)
+            print(final_prompt[:1000])
             response = requests.post(endpoint, json=payload, timeout=300)
+
+            print("Status Code:", response.status_code)
+            print("Response Body:", response.text)
             response.raise_for_status()
             
             elapsed_time = time.time() - start_time

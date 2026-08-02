@@ -152,6 +152,8 @@ def answer_question(question: str, top_k: int = 3, document_id: Optional[str] = 
         context_used = bool(results)
         context_len = len(context) if context else 0
         logger.info(f"Context length: {context_len} characters")
+        print(f"final Gemini prompt/context length: {context_len}")
+        print("==============================\n")
 
         # 6. Pass question and context to Gemini
         # We always call generate_answer; gemini_service handles empty contexts cleanly

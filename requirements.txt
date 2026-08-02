@@ -1,15 +1,22 @@
-fastapi==0.116.1
-uvicorn==0.35.0
-python-multipart==0.0.20
-jinja2==3.1.6
-Pillow==11.3.0
-torch==2.8.0
-transformers==4.55.0
-accelerate==1.10.0
-sentence-transformers==5.1.0
-qdrant-client==1.15.1
-requests==2.32.5
-PyMuPDF==1.26.3
-pydantic==2.11.7
-tqdm==4.67.1
-numpy==2.3.2
+python -m venv venv_test
+
+venv_test\Scripts\activate
+
+python --version
+
+python -m pip install --upgrade pip
+
+pip install fastapi==0.116.1 uvicorn==0.35.0 python-multipart==0.0.20 jinja2==3.1.6
+
+pip install Pillow==11.3.0
+
+pip install git+https://github.com/huggingface/transformers.git
+
+pip install torch==2.8.0 accelerate==1.10.0 sentence-transformers==5.1.0
+
+pip install torchvision==0.23.0
+
+pip install qdrant-client==1.18.0
+
+pip install requests==2.32.5 PyMuPDF==1.26.3 pydantic==2.11.7 tqdm==4.67.1 numpy==1.26.4
+

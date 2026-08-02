@@ -55,6 +55,9 @@ def ingest_pdf(pdf_path: str, document_name: str = "Unknown") -> Optional[Dict[s
 
         total_chunks = 0
         total_vectors = 0
+        total_extracted_text_length = 0
+        first_chunk_preview = "None"
+        embedding_dimension = 0
 
         # Process one page at a time to keep memory usage low
         for idx, image_path in enumerate(image_paths):
@@ -74,6 +77,7 @@ def ingest_pdf(pdf_path: str, document_name: str = "Unknown") -> Optional[Dict[s
                     print(f"OCR output empty. Skipping page {page_number}.")
                     continue
                     
+                total_extracted_text_length += len(page_text)
                 print("OCR completed")
                 
                 # Chunking
@@ -95,10 +99,15 @@ def ingest_pdf(pdf_path: str, document_name: str = "Unknown") -> Optional[Dict[s
                 embedded_chunks = embed_chunks(chunks)
                 print("Embeddings generated")
                 
+                if first_chunk_preview == "None" and chunks:
+                    first_chunk_preview = chunks[0].get("text", "")[:100].replace("\n", " ") + "..."
+                
                 # Validate embeddings before storage
                 valid_chunks = []
                 for chunk in embedded_chunks:
                     emb = chunk.get("embedding")
+                    if embedding_dimension == 0 and emb:
+                        embedding_dimension = len(emb)
                     # Check that embedding exists, is not empty, and length is exactly 384
                     if emb and isinstance(emb, list) and len(emb) == 384:
                         valid_chunks.append(chunk)
@@ -132,6 +141,19 @@ def ingest_pdf(pdf_path: str, document_name: str = "Unknown") -> Optional[Dict[s
         print(f"Total Chunks:  {total_chunks}")
         print(f"Total Vectors: {total_vectors}")
         print("========================================\n")
+        
+        from qdrant_service import count_vectors
+        current_point_count = count_vectors()
+        
+        print("\n=== DEBUG LOGS: FILE UPLOAD ===")
+        print(f"filename: {os.path.basename(pdf_path)}")
+        print(f"file size: {os.path.getsize(pdf_path)} bytes")
+        print(f"extracted text length: {total_extracted_text_length}")
+        print(f"number of chunks: {total_chunks}")
+        print(f"first chunk preview: {first_chunk_preview}")
+        print(f"embedding dimension: {embedding_dimension}")
+        print(f"Qdrant point count: {current_point_count}")
+        print("===============================\n")
         
         # Return ingestion summary dictionary
         return {

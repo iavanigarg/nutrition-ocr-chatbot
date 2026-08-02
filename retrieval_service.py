@@ -16,7 +16,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # 1. Stronger relevance filtering for production
-MIN_SCORE = 0.70
+# Changed MIN_SCORE from 0.70 to 0.0 to avoid rejecting valid embeddings because bge-small-en-v1.5 cosine similarity might not reach 0.70 for all queries.
+MIN_SCORE = 0.0
 
 def search_chunks(query: str, top_k: int = 5, document_id: Optional[str] = None) -> List[Dict[str, Any]]:
     """
@@ -161,6 +162,19 @@ def search_chunks(query: str, top_k: int = 5, document_id: Optional[str] = None)
         total_time = time.time() - total_start_time
         logger.info(f"Total retrieval time: {total_time:.3f} seconds.")
         
+        # Print Debug Logs for User Query
+        print("\n=== DEBUG LOGS: USER QUERY ===")
+        print(f"question: {query}")
+        print(f"query embedding size: {len(query_vector) if query_vector else 0}")
+        print(f"number of retrieved chunks: {len(formatted_results)}")
+        if formatted_results:
+            print(f"retrieved chunk text preview: {formatted_results[0].get('text', '')[:200]}...")
+            scores = [f"{r.get('score', 0.0):.4f}" for r in formatted_results]
+            print(f"similarity scores: {', '.join(scores)}")
+        else:
+            print("retrieved chunk text preview: None")
+            print("similarity scores: None")
+
         # We only return metadata + text + similarity score. Embeddings are NOT returned.
         return formatted_results
 
